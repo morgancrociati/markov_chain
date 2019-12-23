@@ -5,10 +5,10 @@
 
 #include <cassert>
 
-#include "markov_chain.hpp"
+#include "markov_chain_int.hpp"
 
 // ----- PUBLIC -----
-markov_chain::markov_chain(unsigned int seed)
+markov_chain_int::markov_chain_int(unsigned int seed)
 {
     sumStartMatrix = 0;
     if (seed == 0)
@@ -17,11 +17,11 @@ markov_chain::markov_chain(unsigned int seed)
         srand(seed);
 }
 
-markov_chain::~markov_chain()
+markov_chain_int::~markov_chain_int()
 {
 }
 
-void markov_chain::add_state(MARKOV_TYPE state, MARKOV_INT start)
+void markov_chain_int::add_state(MARKOV_TYPE state, MARKOV_INT start)
 {
     assert(find(state) == -1);
     stateNameMatrix.push_back(state);
@@ -37,7 +37,7 @@ void markov_chain::add_state(MARKOV_TYPE state, MARKOV_INT start)
     sumStartMatrix += start;
 }
 
-void markov_chain::set_transition(MARKOV_TYPE stateFrom, MARKOV_TYPE stateTo, MARKOV_INT n){
+void markov_chain_int::set_transition(MARKOV_TYPE stateFrom, MARKOV_TYPE stateTo, MARKOV_INT n){
     MARKOV_INT iStateFrom = find(stateFrom);
     assert(iStateFrom != -1);
     MARKOV_INT iStateTo = find(stateTo);
@@ -48,7 +48,7 @@ void markov_chain::set_transition(MARKOV_TYPE stateFrom, MARKOV_TYPE stateTo, MA
     sumMatrix[iStateFrom] += n;
 }
 
-void markov_chain::add_sample(std::vector<MARKOV_TYPE> tab)
+void markov_chain_int::add_sample(std::vector<MARKOV_TYPE> tab)
 {
     MARKOV_INT i;
     MARKOV_INT state = -1;
@@ -82,7 +82,7 @@ void markov_chain::add_sample(std::vector<MARKOV_TYPE> tab)
     }
 }
 
-std::vector<MARKOV_TYPE> markov_chain::generate(MARKOV_INT size)
+std::vector<MARKOV_TYPE> markov_chain_int::generate(MARKOV_INT size)
 {
     std::vector<MARKOV_TYPE> result;
 
@@ -111,7 +111,7 @@ std::vector<MARKOV_TYPE> markov_chain::generate(MARKOV_INT size)
 }
 
 // ----- PRIVATE -----
-MARKOV_INT markov_chain::get_start(void)
+MARKOV_INT markov_chain_int::get_start(void)
 {
     MARKOV_INT i;
     MARKOV_INT sizeMatrix = stateNameMatrix.size();
@@ -126,7 +126,7 @@ MARKOV_INT markov_chain::get_start(void)
     return -1;
 }
 
-MARKOV_TYPE markov_chain::get_next(MARKOV_INT state)
+MARKOV_TYPE markov_chain_int::get_next(MARKOV_INT state)
 {
     MARKOV_INT i;
     MARKOV_INT sizeMatrix = stateNameMatrix.size();
@@ -141,7 +141,7 @@ MARKOV_TYPE markov_chain::get_next(MARKOV_INT state)
     return -1;
 }
 
-MARKOV_INT markov_chain::find(MARKOV_TYPE element)
+MARKOV_INT markov_chain_int::find(MARKOV_TYPE element)
 {
     MARKOV_INT i;
     MARKOV_INT sizeMatrix = stateNameMatrix.size();

@@ -2,8 +2,9 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
-
+#include <fstream>
 #include <cassert>
+#include <string>
 
 #include "markov_chain_char.hpp"
 
@@ -29,7 +30,7 @@ void markov_chain_char::add_state(char state, MARKOV_INT start)
 
     for (MARKOV_INT i = 0; i < matrixSize - 1; i++)
         matrix[i].push_back(0);
-    
+
     matrix.push_back(std::vector<MARKOV_INT>(matrixSize, 0));
     sumMatrix.push_back(0);
 
@@ -37,12 +38,13 @@ void markov_chain_char::add_state(char state, MARKOV_INT start)
     sumStartMatrix += start;
 }
 
-void markov_chain_char::set_transition(char stateFrom, char stateTo, MARKOV_INT n){
+void markov_chain_char::set_transition(char stateFrom, char stateTo, MARKOV_INT n)
+{
     MARKOV_INT iStateFrom = find(stateFrom);
     assert(iStateFrom != -1);
     MARKOV_INT iStateTo = find(stateTo);
     assert(iStateTo != -1);
-    
+
     sumMatrix[iStateFrom] -= matrix[iStateFrom][iStateTo];
     matrix[iStateFrom][iStateTo] = n;
     sumMatrix[iStateFrom] += n;
@@ -82,7 +84,8 @@ void markov_chain_char::add_sample(std::vector<char> tab)
     }
 }
 
-void markov_chain_char::add_sample(std::string tab){
+void markov_chain_char::add_sample(std::string tab)
+{
     std::vector<char> convert(tab.begin(), tab.end());
     add_sample(convert);
 }
@@ -115,10 +118,61 @@ std::vector<char> markov_chain_char::generate_vector(MARKOV_INT size)
     return result;
 }
 
-std::string markov_chain_char::generate_string(MARKOV_INT size){
+std::string markov_chain_char::generate_string(MARKOV_INT size)
+{
     std::vector<char> convert = generate_vector(size);
     std::string result(convert.begin(), convert.end());
     return result;
+}
+
+void markov_chain_char::write_markov_chain(std::string filePath)
+{
+    MARKOV_INT i, j;
+    MARKOV_INT sizeMatrix = stateNameMatrix.size();
+    std::ofstream file;
+    file.open(filePath);
+    file << sizeMatrix << std::endl;
+    for (i = 0; i < sizeMatrix; i++)
+        file << stateNameMatrix[i] << " " << startMatrix[i] << std::endl;
+    for (i = 0; i < sizeMatrix; i++)
+    {
+        for (j = 0; j < sizeMatrix; j++)
+            file << matrix[i][j] << " ";
+        file << std::endl;
+    }
+    file.close();
+}
+
+void markov_chain_char::read_markov_chain(std::string filePath)
+{
+    MARKOV_INT tmp, numberOfState, i, startInt, endInt, transition;
+    std::string line;
+    std::ifstream file;
+    file.open(filePath);
+    std::getline(file, line);
+    numberOfState = string_2_markov_int(line);
+    for (i = 0; i < numberOfState; i++)
+    {
+        std::getline(file, line);
+        add_state(line[0], string_2_markov_int(line, 2));
+    }
+    for (i = 0; i < numberOfState; i++)
+    {
+        std::getline(file, line);
+        startInt = 0;
+        endInt = 0;
+        transition = 0;
+        while(transition < numberOfState - 1){
+            while(line[endInt] != ' ')
+                endInt++;
+            set_transition(stateNameMatrix[i], stateNameMatrix[transition], string_2_markov_int(line, startInt, endInt));
+            endInt++;
+            startInt = endInt;
+            transition++;
+        }
+        set_transition(stateNameMatrix[i], stateNameMatrix[transition], string_2_markov_int(line, startInt));
+    }
+    file.close();
 }
 
 // ----- PRIVATE -----
@@ -165,4 +219,20 @@ MARKOV_INT markov_chain_char::find(char element)
         }
     }
     return -1;
+}
+
+MARKOV_INT markov_chain_char::string_2_markov_int(std::string s, MARKOV_INT startPos, MARKOV_INT endPos)
+{
+    MARKOV_INT number = 0;
+    MARKOV_INT sizeString = (endPos == -1) ? s.size() : endPos;
+    assert(0 <= startPos && startPos < sizeString);
+    assert((endPos == -1) || (0 <= endPos && endPos <= sizeString));
+    assert((endPos == -1) || (endPos >= startPos));
+    MARKOV_INT i;
+    for (i = startPos; i < sizeString; i++)
+    {
+        if ('0' <= s[i] && s[i] <= '9')
+            number = number * 10 + (s[i] - '0');
+    }
+    return number;
 }

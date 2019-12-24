@@ -20,6 +20,9 @@ public:
 
     std::vector<MARKOV_TYPE> generate(MARKOV_INT size);
 
+    void write_markov_chain(std::string filePath);
+    void read_markov_chain(std::string filePath);
+
 private:
     std::vector<std::vector<MARKOV_INT>> matrix;
     std::vector<MARKOV_INT> sumMatrix;
@@ -30,6 +33,7 @@ private:
     MARKOV_INT sumStartMatrix;
 
     MARKOV_INT find(MARKOV_TYPE element);
+    MARKOV_INT string_2_markov_int(std::string s, MARKOV_INT startPos = 0, MARKOV_INT endPos = -1);
 
     MARKOV_INT get_start(void);
     MARKOV_TYPE get_next(MARKOV_INT state);

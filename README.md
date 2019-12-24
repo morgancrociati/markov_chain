@@ -1,1 +1,1 @@
-# markov_chain
+# Markov Chain Library - C++ 
